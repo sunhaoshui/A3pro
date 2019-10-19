@@ -1,0 +1,8 @@
+<launch>
+
+<node pkg="tf" type="static_transform_publisher" name="map_to_world" args="0.0 0.0 0.0 -1.2707963 0 0 /map /world 40" />
+
+<!--node pkg="tf" type="static_transform_publisher" name="laser_to_body" args="0.0 0.0 0.0 -1.5707963 0.0 1.5707963 /laser /body 40" /-->
+
+</launch>
+

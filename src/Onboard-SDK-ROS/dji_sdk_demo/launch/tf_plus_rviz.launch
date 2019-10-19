@@ -1,0 +1,8 @@
+<launch>
+
+    <include file="$(find dji_sdk_demo )/launch/tf.launch" />
+
+    <include file="$(find vins_estimator)/launch/vins_rviz.launch" />
+
+
+</launch>

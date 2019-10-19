@@ -1,0 +1,14 @@
+<launch>
+
+
+    <node pkg="urg_node" type="urg_node" name="urg_node" args="_ip_address:=192.168.0.10" />
+
+    <include file="$(find dji_sdk)/launch/sdk.launch" />
+
+    <node pkg="topic_tools" type="relay" name="relay" args="/dji_sdk/imu /imu" />
+
+    <include file="$(find cartographer_ros )/launch/hokuyo30lx_imu.launch" />
+
+
+</launch>
+

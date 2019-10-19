@@ -1,0 +1,8 @@
+<launch>
+
+    <include file="$(find cartographer_ros )/launch/hokuyo30lx_imu.launch" />
+
+    <include file="$(find vins_estimator)/launch/realsense_color.launch" />
+
+
+</launch>
