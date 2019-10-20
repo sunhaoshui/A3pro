@@ -3,7 +3,8 @@
 This is the inital unranged project code of the first "Zhi Sheng Kong Tian" UAV competition held by Air Force Engineering University
 
 ## Usage
-Input the key of the osdk in the Inboard-SDK-ROS package. Then the main code is in Onboard-SDK-ROS/dji_sdk_demo/src/my_sdk.cpp
+Input the key of the osdk in the Inboard-SDK-ROS package.   
+The main code is in Onboard-SDK-ROS/dji_sdk_demo/src/my_sdk.cpp
 
 ## Hardware
 I give my hardware architecture as follows:
