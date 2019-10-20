@@ -151,12 +151,12 @@ int main(int argc, char** argv)
   PIDVy.setPID(PIDparam.vy_p,PIDparam.vy_i,PIDparam.vy_d,PIDparam.vy_f);
   PIDVz.setPID(PIDparam.vz_p,PIDparam.vz_i,PIDparam.vz_d,PIDparam.vz_f);
 
-  //config the upper limit of the integration, the maximum of control value and the dead zone of error
-  PIDX.set_sat(2,1.0,0.0);//postion
-  PIDY.set_sat(2,5.0,0.0);//z thrust
-  PIDZ.set_sat(2,0.1,0.0);//roll
-  PIDVx.set_sat(2,0.051,0.0);//degree
-  PIDVy.set_sat(2,1.0,0.0);//yaw
+
+  PIDX.set_sat(2,1.0,0.0);
+  PIDY.set_sat(2,5.0,0.0);
+  PIDZ.set_sat(2,0.1,0.0);
+  PIDVx.set_sat(2,0.051,0.0);
+  PIDVy.set_sat(2,1.0,0.0);
   PIDVz.set_sat(2,1.0,0.0);
 
 
@@ -190,80 +190,41 @@ int main(int argc, char** argv)
   {
     ROS_INFO("A3/N3 taking off!");
     takeoff_result = A3monitoredTakeoff();
-    //takeoff_result = A3TakeoffWithoutGPS();
   }
 
   inital_atti = current_atti;
 
-  //PIDZ_velocity_control( PIDZ, cruse_height );
 
 
-  //PIDVx_Degree_control(PIDVx, 10);
-
-  //PIDXY_Traj_velocity_control(PIDX,PIDVy,10,10);
-  //PIDXY_Traj_velocity_control(PIDX,PIDVy,10,15);
-  //PIDXY_Traj_velocity_control(PIDX,PIDVy,18,10);
-  //PIDXY_Traj_velocity_control(PIDX,PIDVy,10,10);
-  PIDXY_Traj_degree_control(PIDVx,PIDVy,1,1);
-  PIDXY_Traj_degree_control(PIDVx,PIDVy,1.5,2.0);
-  PIDXY_Traj_degree_control(PIDVx,PIDVy,2.0,2.5);
-  PIDXY_Traj_degree_control(PIDVx,PIDVy,2.5,2.5);
-
-
-
-  //PIDYaw_Velocity_control(PIDVy,45);
-
-  //PIDZ_thrust_control(PIDX,PIDX,5);
-
-
-
-
-
-/*
-
-  while( !( tf_receive_flag && laser_flag ) )  //wait for the cartographer to be ready
-  {
-    ros::spinOnce();
-  }
 
   PIDZ_velocity_control( PIDZ, cruse_height );
 
   enter_puzzle( PIDX );
-//  ros::Duration(1.5).sleep();
 
   move_to_door( PIDY );
-//  ros::Duration(1.5).sleep();
 
   int game_end_flag = 1;
 
   while( game_end_flag )
   {
 
-    //if( height < 2.0 )
-   // {
-   //   PIDZ_velocity_control( PIDZ, cruse_height );
-   // }
-
 
     game_end_flag = move_to_saferegine( PIDX );
-//    ros::Duration(1.5).sleep();
 
     if( game_end_flag == 1 )
     {
       move_to_door( PIDY );
-//      ros::Duration(1.5).sleep();
     }
 
     ros::spinOnce();
   }
 
-//  takeoff_land(dji_sdk::DroneTaskControl::Request::TASK_LAND);
 
   std::cout << "end" << std::endl;
   ros::spin();
   return 0;
 
-*/
+
 }
 
 
@@ -586,7 +547,7 @@ void guidance_position_callback(const geometry_msgs::Vector3Stamped::ConstPtr& m
 
 void cartographer2D_callback(const tf2_msgs::TFMessage::ConstPtr& msg)
 {
-    //make sure the /tf is from cartographer
+
     if (msg->transforms[0].header.frame_id == "map")
     {
         tf2_msgs::TFMessage laser = *msg;
@@ -598,7 +559,6 @@ void cartographer2D_callback(const tf2_msgs::TFMessage::ConstPtr& msg)
         cartographer2D_q.x = laser.transforms[0].transform.rotation.x;
         cartographer2D_q.y = laser.transforms[0].transform.rotation.y;
         cartographer2D_q.z = laser.transforms[0].transform.rotation.z;
-        //std::cout << " recevied tf is " << cartographer2D_pos.x << std::endl;
         tf_receive_flag = true;
     }
 }
@@ -607,7 +567,6 @@ void cartographer2D_callback(const tf2_msgs::TFMessage::ConstPtr& msg)
 void ust20lx_callback(const sensor_msgs::LaserScan::ConstPtr& msg)
 {
   ust20lx = *msg;
-  //std::cout << " front " << ust20lx.ranges[540] << "  right  " << ust20lx.ranges[180] << " right " << ust20lx.ranges[900] <<std::endl;
   quad_front_obs = ust20lx.ranges[540];
   quad_left_obs = ust20lx.ranges[900];
   quad_right_obs = ust20lx.ranges[180];
@@ -820,257 +779,7 @@ void PIDXY_velocity_control_cartographer2D(PID PIDinput_x, PID PIDinput_y, float
   }
 }
 
-void test_thrust_balance(float start, float end, float dt)
-{
-  ros::Duration(1).sleep();
-  float z = current_local_pos.z;
-  std::cout <<"current height " << z << std::endl;
 
-  int n = (end - start) / dt;
-  for(int i = 0; i <= n; i ++)
-  {
-    set_control(0, 0, start + dt * i, 0, thrust_control_flag);
-    std::cout << "current thrust is " << start + dt * i << "% , current height is " <<  current_local_pos.z << std::endl;
-    if(current_local_pos.z - z > 0.1)
-    {
-      std::cout << start + dt * i << " is around balance point!";
-      break;
-    }
-
-    ros::Duration(1).sleep();
-    ros::spinOnce();
-
-  }
-}
-
-void PIDZ_thrust_control(PID PidinputP, PID PidinputV, float pos_value_z)
-{
-  float error_z = pos_value_z - current_local_pos.z;
-  ros::Time start_time = ros::Time::now();
-  while(abs(error_z) > error_thousold)
-  {
-    error_z = pos_value_z - current_local_pos.z;
-    float time_inv = get_time_interval(start_time);
-    PidinputP.add_error(error_z,time_inv);
-    PidinputP.pid_output();
-
-    float error_vz = PidinputP.Output - current_vel.vector.z;
-    time_inv = get_time_interval(start_time);
-    PidinputV.add_error(error_vz, time_inv);
-    PidinputV.pid_output();
-
-    //float output_f = PidinputV.Output + weight;
-    //set_control(0.0,0.0,output_f / laragest_force_output,0.0,thrust_control_flag);
-    //std::cout << output_f / laragest_force_output << " " << PidinputV.Output <<std::endl;
-
-    set_control(0.0,0.0, PidinputV.Output + balance_thrust, 0.0,thrust_control_flag);
-    std::cout << PidinputV.Output + balance_thrust << " " << error_z << " " << current_local_pos.z << std::endl;
-    ros::Duration(0.002).sleep();
-    ros::spinOnce();
-
-  }
-}
-
-float yaw_error_dealt(float yaw_value)
-{
-  yaw2 = toEulerAngle(current_atti).z * rad2deg - toEulerAngle(inital_atti).z *rad2deg;
-  if(yaw2 - yaw1 > 300)
-  {
-    yaw2 -=360;
-    if(yaw2 <= -360)
-      yaw2 += 360;
-  }
-  if(yaw2 - yaw1 < -300)
-  {
-    yaw2 += 360;
-    if(yaw2 >= 360)
-      yaw2 -= 360;
-  }
-  float error_yaw = yaw_value - yaw2;
-  if(error_yaw > 180)
-    error_yaw -= 360;
-  if(error_yaw < -180)
-    error_yaw += 360;
-  return error_yaw;
-}
-
-void PIDYaw_Velocity_control(PID PIDinput,float yaw_value) // yaw_value range from 0 to 360
-{
-  float error_yaw = yaw_error_dealt(yaw_value);
-
-  ros::Time start_time = ros::Time::now();
-
-  while(abs(error_yaw) > error_thousold_yaw)
-  {
-    error_yaw = yaw_error_dealt(yaw_value);
-
-    float time_inv = get_time_interval(start_time);
-    PIDinput.add_error(error_yaw,time_inv);
-    PIDinput.pid_output();
-    set_control(0.0,0.0,0.0,PIDinput.Output,velocity_control_flag);
-    ros::Duration(0.002).sleep();
-    ros::spinOnce();
-
-  }
-}
-
-//calulate the yaw angle in body frame(yaw range from 0 to 360)
-float yaw_value_dealt(float x,float y)
-{
-  float angle = atan(y / x) * rad2deg;
-  if((x > 0)&&(y < 0))
-    angle = 360 - abs(angle);
-  if((x < 0)&&(y > 0))
-    angle = 180 - abs(angle);
-  if((x < 0)&&(y < 0))
-    angle = 180 + angle;
-
-  return angle;
-}
-
-
-void PIDXY_Traj_velocity_control(PID PIDinput, PID PIDinputYaw, float pos_value_x, float pos_value_y)
-{
-  float error_x = pos_value_x - current_local_pos.x;
-  float error_y = pos_value_y - current_local_pos.y;
-  float input_l = sqrt(error_x * error_x + error_y * error_y);
-  float error_l = input_l;
-  float sinl = error_x / error_l;
-  float cosl = error_y / error_l;
-
-  float yaw_value = yaw_value_dealt(error_x, error_y);
-
-  float error_yaw = yaw_error_dealt(yaw_value);
-  std::cout << yaw_value_dealt(error_x, error_y) << " " << (toEulerAngle(current_atti).z - toEulerAngle(inital_atti).z) * rad2deg << std::endl;
-
-  ros::Time start_time = ros::Time::now();
-
-  while(error_l > error_thousold)
-  {
-    error_x = pos_value_x - current_local_pos.x;
-    error_y = pos_value_y - current_local_pos.y;
-    error_l = sqrt(error_x * error_x + error_y * error_y);
-    sinl = error_x / error_l;
-    cosl = error_y / error_l;
-
-    //yaw_value = yaw_value_dealt(error_x, error_y);
-    error_yaw = yaw_error_dealt(yaw_value);
-
-    float time_inv = get_time_interval(start_time);
-    PIDinput.add_error(error_l,time_inv);
-    PIDinput.pid_output();
-
-    PIDinputYaw.add_error(error_yaw,time_inv);
-    PIDinputYaw.pid_output();
-
-    geometry_msgs::Point world, body;
-    world.x = PIDinput.Output * sinl;
-    world.y = PIDinput.Output * cosl;
-    world.z = height;
-    body = rotation_coordinate( current_atti,rotation_coordinate_inverse(inital_atti,world));
-
-    set_control( body.x, body.y, 0.0, PIDinputYaw.Output, velocity_control_flag);
-    yaw1 = yaw2;
-
-    ros::Duration(0.002).sleep();
-    ros::spinOnce();
-  }
-}
-
-
-void PIDXYYaw_velocity_control(PID PIDinput, PID PIDinputYaw, float pos_value_x, float pos_value_y, float yaw_value)
-{
-  float error_x = pos_value_x - current_local_pos.x;
-  float error_y = pos_value_y - current_local_pos.y;
-  float input_l = sqrt(error_x * error_x + error_y * error_y);
-  float error_l = input_l;
-  float sinl = error_x / error_l;
-  float cosl = error_y / error_l;
-
-  float error_yaw = yaw_error_dealt(yaw_value);
-  std::cout << yaw_value_dealt(error_x, error_y) << " " << (toEulerAngle(current_atti).z - toEulerAngle(inital_atti).z) * rad2deg << std::endl;
-
-  ros::Time start_time = ros::Time::now();
-
-  while(error_l > error_thousold)
-  {
-    error_x = pos_value_x - current_local_pos.x;
-    error_y = pos_value_y - current_local_pos.y;
-    error_l = sqrt(error_x * error_x + error_y * error_y);
-    sinl = error_x / error_l;
-    cosl = error_y / error_l;
-
-    error_yaw = yaw_error_dealt(yaw_value);
-
-    float time_inv = get_time_interval(start_time);
-    PIDinput.add_error(error_l,time_inv);
-    PIDinput.pid_output();
-
-    PIDinputYaw.add_error(error_yaw,time_inv);
-    PIDinputYaw.pid_output();
-
-    geometry_msgs::Point world, body;
-    world.x = PIDinput.Output * sinl;
-    world.y = PIDinput.Output * cosl;
-    world.z = height;
-    body = rotation_coordinate( current_atti,rotation_coordinate_inverse(inital_atti,world));
-
-    set_control( body.x, body.y, 0.0, PIDinputYaw.Output, velocity_control_flag);
-    yaw1 = yaw2;
-
-    ros::Duration(0.002).sleep();
-    ros::spinOnce();
-  }
-}
-
-
-void PIDXY_Traj_degree_control(PID PIDinput, PID PIDinputYaw, float pos_value_x, float pos_value_y)
-{
-  float error_x = pos_value_x - current_local_pos.x;
-  float error_y = pos_value_y - current_local_pos.y;
-  float input_l = sqrt(error_x * error_x + error_y * error_y);
-  float error_l = input_l;
-  float sinl = error_x / error_l;
-  float cosl = error_y / error_l;
-
-  float yaw_value = yaw_value_dealt(error_x, error_y);
-
-  float error_yaw = yaw_error_dealt(yaw_value);
-  std::cout << yaw_value_dealt(error_x, error_y) << " " << (toEulerAngle(current_atti).z - toEulerAngle(inital_atti).z) * rad2deg << std::endl;
-
-  ros::Time start_time = ros::Time::now();
-
-  while(error_l > error_thousold)
-  {
-    error_x = pos_value_x - current_local_pos.x;
-    error_y = pos_value_y - current_local_pos.y;
-    error_l = sqrt(error_x * error_x + error_y * error_y);
-    sinl = error_x / error_l;
-    cosl = error_y / error_l;
-
-    //yaw_value = yaw_value_dealt(error_x, error_y);
-    error_yaw = yaw_error_dealt(yaw_value);
-
-    float time_inv = get_time_interval(start_time);
-    PIDinput.add_error(error_l,time_inv);
-    PIDinput.pid_output();
-
-    PIDinputYaw.add_error(error_yaw,time_inv);
-    PIDinputYaw.pid_output();
-
-    geometry_msgs::Point world, body;
-    world.x = PIDinput.Output * sinl;
-    world.y = PIDinput.Output * cosl;
-    world.z = height;
-    body = rotation_coordinate( current_atti,rotation_coordinate_inverse(inital_atti,world));
-    std::cout << -body.y << " " << body.x << std::endl;
-    set_control( -body.y, body.x, 0.0, PIDinputYaw.Output, degree_control_flag);
-    yaw1 = yaw2;
-
-    ros::Duration(0.002).sleep();
-    ros::spinOnce();
-  }
-}
 
 
 int degree_to_number(float degree)
