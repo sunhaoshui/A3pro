@@ -24,3 +24,4 @@ Battery|ACE 4S 30C 5300mAh|
 ## Software
 Cartographer: Use to locate the UAV in SE(2)
 VINS-Mono:Use to locate the UAV in SE(3)
+The version of the Onboard SDK used in this project is 3.6
