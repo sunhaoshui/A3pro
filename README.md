@@ -2,15 +2,15 @@
 
 This is the inital unranged project code of the first "Zhi Sheng Kong Tian" UAV competition held by Air Force Engineering University
 
-##Usage
+## Usage
 Input the key of the osdk in the Inboard-SDK-ROS package. Then the main code is in Onboard-SDK-ROS/dji_sdk_demo/src/my_sdk.cpp
 
-##Hardware
+## Hardware
 I give my hardware architecture as follows:
 
 
 Item |Type|Note
----|:--:|---:
+:---:|:--:|:---:
 Flight controller|DJI A3|
 Remote control|DJI Datalink3|
 Lidar|Hokuyo UST20LX|It is much more efficient to use lidar to search for  windows than camera
@@ -21,6 +21,6 @@ Onboard computer|NUC8i7|
 Aircraft|DH410|A 410mm quadrotor and the mtors are from the TMOTOR|
 Battery|ACE 4S 30C 5300mAh|
 
-##Software
+## Software
 Cartographer: Use to locate the UAV in SE(2)
 VINS-Mono:Use to locate the UAV in SE(3)
