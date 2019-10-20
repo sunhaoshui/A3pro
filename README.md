@@ -10,14 +10,14 @@ I give my hardware architecture as follows:
 
 
 Item |Type|Note
-:---:|:--:|:---:
+:---:|:---:|:---:
 Flight controller|DJI A3|
 Remote control|DJI Datalink3|
 Lidar|Hokuyo UST20LX|It is much more efficient to use lidar to search for  windows than camera
 Camera|MVBlueFoxMLC200|
-|Intel Realsense D435i|This is can provide you with depth and imu information if you need|
+Camera|Intel Realsense D435i|This is can provide you with depth and imu information if you need|
 Onboard computer|NUC8i7|
-|Nvidia Jetson TX2|Can provide you with the GPU ability
+Onboard computer|Nvidia Jetson TX2|Can provide you with the GPU ability
 Aircraft|DH410|A 410mm quadrotor and the mtors are from the TMOTOR|
 Battery|ACE 4S 30C 5300mAh|
 
