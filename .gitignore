@@ -1,0 +1,7 @@
+A3pro.workspace
+A3pro.workspace.user
+
+build/
+install/
+devel/
+logs/
