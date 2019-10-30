@@ -1,7 +1,9 @@
 A3pro.workspace
+.catkin_workspace
 A3pro.workspace.user
 
 build/
 install/
 devel/
 logs/
+
